@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,10 +14,10 @@ export const viewport: Viewport = {
   themeColor: "#111827"
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children} suppressHydrationWarning</body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

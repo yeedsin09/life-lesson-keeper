@@ -5,6 +5,8 @@ import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { Lesson } from "@/types/lesson";
 
+import { getSourceDocuments, SourceDocument } from "@/lib/sourceDocuments";
+
 type ViewMode = "all" | "reminders" | "aoa" | "mistakes" | "images";
 
 type LessonForm = {
@@ -18,6 +20,7 @@ type LessonForm = {
   source_name: string;
   source_link: string;
   source_date: string;
+  source_document_id: string;
   category: string;
   priority: "Low" | "Medium" | "High";
   reminder_required: "Yes" | "No";
@@ -39,6 +42,7 @@ const emptyForm: LessonForm = {
   source_name: "",
   source_link: "",
   source_date: "",
+  source_document_id: "",
   category: "Personal Growth",
   priority: "Medium",
   reminder_required: "No",
@@ -112,6 +116,7 @@ function lessonToForm(lesson: Lesson): LessonForm {
     source_name: lesson.source_name ?? "",
     source_link: lesson.source_link ?? "",
     source_date: lesson.source_date ?? "",
+    source_document_id: (lesson as Lesson & { source_document_id?: string | null }).source_document_id ?? "",
     category: lesson.category ?? "Personal Growth",
     priority: lesson.priority ?? "Medium",
     reminder_required: lesson.reminder_required ?? "No",
@@ -140,6 +145,16 @@ export default function HomePage() {
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [message, setMessage] = useState("");
+  const [sourceDocuments, setSourceDocuments] = useState<SourceDocument[]>([]);
+
+  async function loadSourceDocuments() {
+    try {
+      const docs = await getSourceDocuments();
+      setSourceDocuments(docs);
+    } catch (error) {
+      console.error("Unable to load source documents:", error);
+    }
+  }
 
   async function loadLessons() {
     setLoading(true);
@@ -178,7 +193,9 @@ export default function HomePage() {
     async function init() {
       const { data } = await supabase.auth.getSession();
       setUser(data.session?.user ?? null);
-      if (data.session?.user) await loadLessons();
+      if (data.session?.user) {
+        await Promise.all([loadLessons(), loadSourceDocuments()]);
+      }
       setLoading(false);
     }
 
@@ -186,8 +203,14 @@ export default function HomePage() {
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) loadLessons();
-      if (!session?.user) setLessons([]);
+      if (session?.user) {
+        loadLessons();
+        loadSourceDocuments();
+      }
+      if (!session?.user) {
+        setLessons([]);
+        setSourceDocuments([]);
+      }
     });
 
     return () => listener.subscription.unsubscribe();
@@ -247,6 +270,7 @@ export default function HomePage() {
         source_name: form.source_name.trim() || null,
         source_link: form.source_link.trim() || null,
         source_date: form.source_date || null,
+        source_document_id: form.source_document_id || null,
         category: form.category || null,
         priority: form.priority,
         reminder_required: form.reminder_required,
@@ -341,6 +365,13 @@ export default function HomePage() {
       corrections: lessons.filter((item) => item.lesson_type === "Work Correction" || item.source_type === "Work Correction").length
     };
   }, [lessons]);
+
+  const sourceDocumentTitleById = useMemo(() => {
+    return sourceDocuments.reduce<Record<string, string>>((acc, document) => {
+      acc[document.id] = document.title;
+      return acc;
+    }, {});
+  }, [sourceDocuments]);
 
   const filteredLessons = useMemo(() => {
     const lower = query.toLowerCase();
@@ -462,6 +493,23 @@ export default function HomePage() {
                   <label>Source Name</label>
                   <input value={form.source_name} onChange={(event) => setForm({ ...form, source_name: event.target.value })} placeholder="Sir AOA, Facebook page, book title" />
                 </div>
+              </div>
+
+
+
+              <div className="field">
+                <label>Source Document</label>
+                <select value={form.source_document_id} onChange={(event) => setForm({ ...form, source_document_id: event.target.value })}>
+                  <option value="">No linked source document</option>
+                  {sourceDocuments.map((document) => (
+                    <option key={document.id} value={document.id}>
+                      {document.title}
+                    </option>
+                  ))}
+                </select>
+                <p className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+                  Link this lesson to a saved Sir AOA conversation from Source Documents.
+                </p>
               </div>
 
               <div className="row">
@@ -634,6 +682,11 @@ export default function HomePage() {
                   <div className="pills">
                     <span className="pill">Learned: {item.date_learned ?? "Not set"}</span>
                     <span className="pill">Source: {asText(item.source_name)}</span>
+                    {(item as Lesson & { source_document_id?: string | null }).source_document_id ? (
+                      <span className="pill">
+                        Source Doc: {sourceDocumentTitleById[(item as Lesson & { source_document_id?: string | null }).source_document_id as string] ?? "Linked"}
+                      </span>
+                    ) : null}
                     {item.reminder_frequency ? <span className="pill">Review: {item.reminder_frequency}</span> : null}
                     {(item.tags ?? []).map((tag) => <span key={tag} className="pill">#{tag}</span>)}
                   </div>
