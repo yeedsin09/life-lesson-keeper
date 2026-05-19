@@ -55,7 +55,7 @@ export default function SourceDocumentsPage() {
           <p className="text-sm text-gray-500">
             Full Sir AOA conversations saved for reference and lesson extraction.
           </p>
-        </div>f
+        </div>
 
         <Link
           href="/source-documents/new"
