@@ -1,5 +1,20 @@
 create extension if not exists pgcrypto;
 
+create table if not exists public.source_documents (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
+  title text not null,
+  source_type text not null default 'Sir AOA',
+  date_received date not null default current_date,
+  summary text,
+  key_themes text[] not null default '{}',
+  markdown_body text not null,
+  status text not null default 'Unread' check (status in ('Unread', 'Reading', 'Processed', 'Archived')),
+  extracted_lessons_count integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.lessons (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade default auth.uid(),
@@ -14,6 +29,7 @@ create table if not exists public.lessons (
   source_name text,
   source_link text,
   source_date date,
+  source_document_id uuid references public.source_documents(id) on delete set null,
   category text,
   priority text not null default 'Medium' check (priority in ('Low', 'Medium', 'High')),
   reminder_required text not null default 'No' check (reminder_required in ('Yes', 'No')),
@@ -29,12 +45,42 @@ create table if not exists public.lessons (
   updated_at timestamptz not null default now()
 );
 
+alter table public.lessons
+  add column if not exists source_document_id uuid references public.source_documents(id) on delete set null;
+
+alter table public.source_documents enable row level security;
 alter table public.lessons enable row level security;
+
+drop policy if exists "Users read own source documents" on public.source_documents;
+drop policy if exists "Users insert own source documents" on public.source_documents;
+drop policy if exists "Users update own source documents" on public.source_documents;
+drop policy if exists "Users delete own source documents" on public.source_documents;
 
 drop policy if exists "Users read own lessons" on public.lessons;
 drop policy if exists "Users insert own lessons" on public.lessons;
 drop policy if exists "Users update own lessons" on public.lessons;
 drop policy if exists "Users delete own lessons" on public.lessons;
+
+create policy "Users read own source documents"
+  on public.source_documents for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create policy "Users insert own source documents"
+  on public.source_documents for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+create policy "Users update own source documents"
+  on public.source_documents for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "Users delete own source documents"
+  on public.source_documents for delete
+  to authenticated
+  using (auth.uid() = user_id);
 
 create policy "Users read own lessons"
   on public.lessons for select
@@ -68,6 +114,12 @@ $$ language plpgsql;
 drop trigger if exists set_lessons_updated_at on public.lessons;
 create trigger set_lessons_updated_at
 before update on public.lessons
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists set_source_documents_updated_at on public.source_documents;
+create trigger set_source_documents_updated_at
+before update on public.source_documents
 for each row
 execute function public.set_updated_at();
 

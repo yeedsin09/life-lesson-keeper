@@ -47,6 +47,21 @@ export async function getSourceDocuments() {
   return data as SourceDocument[];
 }
 
+export async function getSourceDocument(id: string) {
+  const userId = await getCurrentUserId();
+
+  const { data, error } = await supabase
+    .from("source_documents")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .single();
+
+  if (error) throw error;
+
+  return data as SourceDocument;
+}
+
 export async function createSourceDocument(input: {
   title: string;
   dateReceived: string;

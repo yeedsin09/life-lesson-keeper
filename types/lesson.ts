@@ -16,6 +16,7 @@ export type Lesson = {
   source_name: string | null;
   source_link: string | null;
   source_date: string | null;
+  source_document_id: string | null;
   category: string | null;
   priority: LessonPriority;
   reminder_required: ReminderRequired;

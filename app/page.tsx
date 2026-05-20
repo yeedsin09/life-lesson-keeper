@@ -117,7 +117,7 @@ function lessonToForm(lesson: Lesson): LessonForm {
     source_name: lesson.source_name ?? "",
     source_link: lesson.source_link ?? "",
     source_date: lesson.source_date ?? "",
-    source_document_id: (lesson as Lesson & { source_document_id?: string | null }).source_document_id ?? "",
+    source_document_id: lesson.source_document_id ?? "",
     category: lesson.category ?? "Personal Growth",
     priority: lesson.priority ?? "Medium",
     reminder_required: lesson.reminder_required ?? "No",
@@ -686,10 +686,13 @@ export default function HomePage() {
                   <div className="pills">
                     <span className="pill">Learned: {item.date_learned ?? "Not set"}</span>
                     <span className="pill">Source: {asText(item.source_name)}</span>
-                    {(item as Lesson & { source_document_id?: string | null }).source_document_id ? (
-                      <span className="pill">
-                        Source Doc: {sourceDocumentTitleById[(item as Lesson & { source_document_id?: string | null }).source_document_id as string] ?? "Linked"}
-                      </span>
+                    {item.source_document_id ? (
+                      <Link
+                        className="pill pill-link"
+                        href={`/source-documents/${item.source_document_id}`}
+                      >
+                        Source Doc: {sourceDocumentTitleById[item.source_document_id] ?? "Linked"}
+                      </Link>
                     ) : null}
                     {item.reminder_frequency ? <span className="pill">Review: {item.reminder_frequency}</span> : null}
                     {(item.tags ?? []).map((tag) => <span key={tag} className="pill">#{tag}</span>)}

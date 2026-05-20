@@ -94,7 +94,14 @@ export default function SourceDocumentsPage() {
               <article key={document.id} className="card doc-card">
                 <div className="doc-card-header">
                   <div>
-                    <h2>{document.title}</h2>
+                    <h2>
+                      <Link
+                        className="title-link"
+                        href={`/source-documents/${document.id}`}
+                      >
+                        {document.title}
+                      </Link>
+                    </h2>
                     <p className="doc-meta">
                       {document.source_type} / {document.date_received}
                     </p>
@@ -134,6 +141,15 @@ export default function SourceDocumentsPage() {
                 <p className="doc-count">
                   Extracted lessons: {document.extracted_lessons_count}
                 </p>
+
+                <div className="inline-actions">
+                  <Link
+                    href={`/source-documents/${document.id}`}
+                    className="small-link"
+                  >
+                    Open parsed Markdown
+                  </Link>
+                </div>
               </article>
             ))}
           </section>

@@ -338,6 +338,16 @@ textarea:focus {
   color: var(--success);
 }
 
+.pill-link {
+  border: 0;
+  text-decoration: none;
+}
+
+.pill-link:hover {
+  background: var(--dark);
+  color: white;
+}
+
 .lesson-body {
   color: #374151;
   line-height: 1.58;
@@ -357,6 +367,15 @@ textarea:focus {
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;
+}
+
+.title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.title-link:hover {
+  color: var(--accent);
 }
 
 .small-link:hover {
@@ -441,6 +460,192 @@ textarea:focus {
   font-size: 14px;
 }
 
+.document-reader {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.reader-sidebar,
+.reader-main {
+  display: grid;
+  gap: 16px;
+}
+
+.reader-meta {
+  display: grid;
+  gap: 6px;
+}
+
+.reader-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.reader-stats div {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.58);
+  padding: 10px;
+}
+
+.reader-stats strong {
+  display: block;
+  color: var(--dark);
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.reader-stats span {
+  display: block;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.compact-tabs {
+  margin-top: 0;
+}
+
+.conversation-list {
+  display: grid;
+  gap: 12px;
+}
+
+.readable-conversation {
+  display: grid;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.readable-turn {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(231, 220, 200, 0.86);
+}
+
+.readable-turn:last-child {
+  border-bottom: 0;
+}
+
+.readable-speaker {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.readable-speaker span {
+  height: fit-content;
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: #eef4ff;
+  color: #1849a9;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.readable-turn.speaker-assistant .readable-speaker span {
+  background: #dcfae6;
+  color: #027a48;
+}
+
+.readable-turn.speaker-system .readable-speaker span {
+  background: #fef0c7;
+  color: #7a271a;
+}
+
+.readable-turn.speaker-note .readable-speaker span {
+  background: var(--accent-soft);
+  color: var(--dark);
+}
+
+.readable-content {
+  width: min(760px, 100%);
+  color: #263241;
+  font-size: 16px;
+  line-height: 1.72;
+}
+
+.readable-content p + p {
+  margin-top: 12px;
+}
+
+.conversation-turn {
+  border: 1px solid var(--line);
+  border-left-width: 5px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.62);
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.speaker-user {
+  border-left-color: #1849a9;
+}
+
+.speaker-assistant {
+  border-left-color: #027a48;
+}
+
+.speaker-system {
+  border-left-color: #7a271a;
+}
+
+.speaker-note {
+  border-left-color: var(--accent);
+}
+
+.turn-speaker {
+  width: fit-content;
+  border-radius: var(--radius-sm);
+  background: #eef4ff;
+  color: #1849a9;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.speaker-assistant .turn-speaker {
+  background: #dcfae6;
+  color: #027a48;
+}
+
+.speaker-system .turn-speaker {
+  background: #fef0c7;
+  color: #7a271a;
+}
+
+.speaker-note .turn-speaker {
+  background: var(--accent-soft);
+  color: var(--dark);
+}
+
+.turn-content {
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.markdown-raw {
+  max-height: 72vh;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #111827;
+  color: #f9fafb;
+  padding: 14px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     padding: 14px;
@@ -461,6 +666,7 @@ textarea:focus {
   }
 
   .grid,
+  .document-reader,
   .stats,
   .row,
   .filters {
@@ -473,6 +679,15 @@ textarea:focus {
 
   .lesson-top {
     flex-direction: column;
+  }
+
+  .readable-turn {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .readable-speaker {
+    justify-content: flex-start;
   }
 
   .btn {
