@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { Lesson } from "@/types/lesson";
@@ -446,7 +447,10 @@ export default function HomePage() {
             <h1>Life Lesson Keeper</h1>
             <p className="muted">Add, review, and protect the lessons you want to remember.</p>
           </div>
-          <button className="btn ghost" onClick={signOut}>Sign out</button>
+          <div className="inline-actions">
+            <Link className="btn secondary" href="/source-documents">Source Documents</Link>
+            <button className="btn ghost" onClick={signOut}>Sign out</button>
+          </div>
         </header>
 
         <section className="stats">
@@ -507,7 +511,7 @@ export default function HomePage() {
                     </option>
                   ))}
                 </select>
-                <p className="muted" style={{ marginTop: 6, fontSize: 12 }}>
+                <p className="form-help">
                   Link this lesson to a saved Sir AOA conversation from Source Documents.
                 </p>
               </div>
